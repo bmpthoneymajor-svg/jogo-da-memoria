@@ -1,0 +1,366 @@
+
+/* =================================
+   JOGO DA MEMÓRIA - FUTURISTA NEON
+================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --azul-neon: #00d9ff;
+    --azul-claro: #70ecff;
+    --roxo-neon: #875cff;
+    --fundo: #070b18;
+    --painel: rgba(16, 29, 57, 0.85);
+    --branco: #ffffff;
+}
+
+body {
+    min-height: 100vh;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: var(--branco);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 25px;
+
+    background:
+        radial-gradient(circle at 15% 20%,
+        rgba(0, 217, 255, 0.15), transparent 30%),
+        radial-gradient(circle at 85% 80%,
+        rgba(135, 92, 255, 0.16), transparent 35%),
+        linear-gradient(135deg, #050817, #101b38, #080d20);
+}
+
+/* Efeito de iluminação do fundo */
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+
+    background-image:
+        linear-gradient(rgba(0,217,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,217,255,0.025) 1px, transparent 1px);
+
+    background-size: 40px 40px;
+}
+
+/* PAINEL PRINCIPAL */
+
+.container {
+    position: relative;
+    z-index: 1;
+
+    width: 100%;
+    max-width: 720px;
+
+    padding: 40px;
+
+    text-align: center;
+
+    background: var(--painel);
+
+    border: 1px solid rgba(0,217,255,0.3);
+    border-radius: 25px;
+
+    box-shadow:
+        0 0 30px rgba(0,217,255,0.12),
+        0 20px 60px rgba(0,0,0,0.5);
+
+    backdrop-filter: blur(18px);
+}
+
+/* TÍTULO */
+
+h1 {
+    font-size: clamp(27px, 5vw, 40px);
+    font-weight: 800;
+    letter-spacing: 2px;
+
+    color: var(--azul-neon);
+
+    text-shadow:
+        0 0 10px rgba(0,217,255,0.8),
+        0 0 25px rgba(0,217,255,0.35);
+
+    margin-bottom: 12px;
+}
+
+.container > p:first-of-type {
+    color: #a9c7e9;
+    font-size: 15px;
+    letter-spacing: 1px;
+}
+
+/* PLACAR */
+
+.informacoes {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+
+    margin: 30px 0;
+}
+
+.informacoes span {
+    flex: 1;
+
+    padding: 16px 10px;
+
+    background: rgba(0,217,255,0.07);
+
+    border: 1px solid rgba(0,217,255,0.3);
+    border-radius: 12px;
+
+    color: #b9d9f5;
+    font-size: 14px;
+}
+
+.informacoes strong {
+    display: block;
+
+    margin-top: 6px;
+
+    color: var(--azul-neon);
+    font-size: 25px;
+
+    text-shadow: 0 0 12px rgba(0,217,255,0.6);
+}
+
+/* TABULEIRO */
+
+.tabuleiro {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+}
+
+/* CARTAS */
+
+.carta {
+    position: relative;
+
+    width: 100%;
+    aspect-ratio: 1;
+
+    margin: 0;
+    padding: 0;
+
+    border: 1px solid rgba(0,217,255,0.5);
+    border-radius: 15px;
+
+    background:
+        linear-gradient(145deg, #172d50, #101a35);
+
+    color: var(--azul-neon);
+
+    font-size: clamp(25px, 5vw, 42px);
+
+    cursor: pointer;
+
+    box-shadow:
+        inset 0 0 15px rgba(0,217,255,0.05),
+        0 5px 15px rgba(0,0,0,0.25);
+
+    transition:
+        transform 0.3s ease,
+        background 0.3s ease,
+        box-shadow 0.3s ease,
+        border-color 0.3s ease;
+}
+
+.carta::after {
+    content: "✦";
+    position: absolute;
+    inset: 0;
+
+    display: grid;
+    place-items: center;
+
+    color: rgba(0,217,255,0.75);
+    font-size: 35px;
+
+    pointer-events: none;
+}
+
+/* EFEITO AO PASSAR O MOUSE */
+
+.carta:not(.revelada):not(.acertada):hover {
+    transform: translateY(-5px) scale(1.035);
+
+    border-color: var(--azul-neon);
+
+    box-shadow:
+        0 0 12px rgba(0,217,255,0.5),
+        0 0 25px rgba(0,217,255,0.15);
+}
+
+/* CARTA REVELADA */
+
+.carta.revelada {
+    background:
+        linear-gradient(145deg, #087b9b, #263d79);
+
+    color: white;
+
+    border: 2px solid var(--azul-claro);
+
+    box-shadow:
+        0 0 15px rgba(0,217,255,0.7),
+        inset 0 0 15px rgba(255,255,255,0.15);
+
+    animation: revelar 0.3s ease;
+}
+
+.carta.revelada::after {
+    display: none;
+}
+
+/* PAR ENCONTRADO */
+
+.carta.acertada {
+    background:
+        linear-gradient(145deg, #087c69, #123e52);
+
+    border: 2px solid #42ffc4;
+
+    color: #ffffff;
+
+    cursor: default;
+
+    box-shadow:
+        0 0 15px rgba(66,255,196,0.5);
+}
+
+.carta.acertada::after {
+    display: none;
+}
+
+/* ANIMAÇÃO DE REVELAÇÃO */
+
+@keyframes revelar {
+    0% {
+        transform: scale(0.85);
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* BOTÃO REINICIAR */
+
+#reiniciar {
+    margin-top: 30px;
+
+    padding: 15px 35px;
+
+    border: 1px solid var(--azul-neon);
+    border-radius: 12px;
+
+    background: linear-gradient(90deg, #087da0, #3448a4);
+
+    color: white;
+
+    font-size: 15px;
+    font-weight: bold;
+    letter-spacing: 1px;
+
+    cursor: pointer;
+
+    box-shadow: 0 0 15px rgba(0,217,255,0.2);
+
+    transition: 0.3s ease;
+}
+
+#reiniciar:hover {
+    transform: translateY(-3px);
+
+    background: linear-gradient(90deg, #00aaca, #6650d9);
+
+    box-shadow:
+        0 0 15px rgba(0,217,255,0.6),
+        0 0 30px rgba(0,217,255,0.2);
+}
+
+#reiniciar:active {
+    transform: scale(0.96);
+}
+
+/* MENSAGEM DE VITÓRIA */
+
+#mensagem {
+    margin-top: 22px;
+
+    color: #42ffc4;
+
+    font-size: 18px;
+    font-weight: bold;
+
+    text-shadow: 0 0 12px rgba(66,255,196,0.5);
+}
+
+/* ACESSIBILIDADE */
+
+button:focus-visible {
+    outline: 3px solid white;
+    outline-offset: 4px;
+}
+
+/* RESPONSIVIDADE */
+
+@media (max-width: 550px) {
+
+    body {
+        padding: 12px;
+    }
+
+    .container {
+        padding: 22px 15px;
+        border-radius: 18px;
+    }
+
+    .tabuleiro {
+        gap: 9px;
+    }
+
+    .informacoes {
+        gap: 8px;
+        margin: 22px 0;
+    }
+
+    .informacoes span {
+        padding: 12px 5px;
+        font-size: 12px;
+    }
+
+    .informacoes strong {
+        font-size: 21px;
+    }
+
+    .carta {
+        border-radius: 10px;
+    }
+
+    #reiniciar {
+        width: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
